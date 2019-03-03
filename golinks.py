@@ -78,6 +78,12 @@ def respond_internal_url(response, destination):
         destination)
 
 
+@hug.get('/')
+def admin_handler(request, response):
+    response.content_type = falcon.MEDIA_HTML
+    response.body = "foo"
+    pass
+
 @hug.sink('/')
 def handle(request, response):
     """Main shortlink handler"""
