@@ -110,9 +110,14 @@ def handle(request, response):
         # Trying to create a go link with no data. Error
         print("Trying to create a go link with no data. Error")
 
+@hug.get('/')
+def admin_handler(request, response):
+    response.content_type = falcon.MEDIA_HTML
+    response.body = open('dist/index.html', 'r').read()
+
 @hug.static('/_admin')
 def admin_handler():
-    return ("dist",)
+    return ("dist/",)
 
 # Some testing fixtures
 if __name__ == '__main__':
