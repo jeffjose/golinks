@@ -63,7 +63,8 @@ def respond_external_url(response, destination):
     Use 301 to redirect regular URLs
     """
 
-    response.status = falcon.HTTP_301
+    #response.status = falcon.HTTP_301
+    response.status = falcon.HTTP_302
     response.set_header('Location', destination)
 
 
@@ -76,13 +77,6 @@ def respond_internal_url(response, destination):
 
     response.body = '''<html><head><script>window.location="http://{0}";</script></head><body>Redirecting to {0}</body></html>'''.format(
         destination)
-
-
-@hug.get('/')
-def admin_handler(request, response):
-    response.content_type = falcon.MEDIA_HTML
-    response.body = "foo"
-    pass
 
 @hug.sink('/')
 def handle(request, response):
@@ -115,6 +109,12 @@ def handle(request, response):
     elif request.method == 'POST' and not body:
         # Trying to create a go link with no data. Error
         print("Trying to create a go link with no data. Error")
+
+@hug.static('/_admin')
+def admin_handlerx():
+    #response.content_type = falcon.MEDIA_HTML
+    #response.body = "foo"
+    return (".",)
 
 
 # Some testing fixtures
