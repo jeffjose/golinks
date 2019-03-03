@@ -1,7 +1,7 @@
 import hug
 import simplejson as json
 
-from falcon import HTTP_301
+import falcon
 
 from path import Path
 
@@ -58,6 +58,26 @@ def write_db(data):
     json.dump(data, open(DB, 'w'))
 
 
+def respond_external_url(response, destination):
+    """
+    Use 301 to redirect regular URLs
+    """
+
+    response.status = falcon.HTTP_301
+    response.set_header('Location', destination)
+
+
+def respond_internal_url(response, destination):
+    """
+    Use javascript to redirect Internal URLs
+    """
+
+    response.content_type = falcon.MEDIA_HTML
+
+    response.body = '''<html><head><script>window.location="http://{0}";</script></head><body>Redirecting to {0}</body></html>'''.format(
+        destination)
+
+
 @hug.sink('/')
 def handle(request, response):
     """Main shortlink handler"""
@@ -70,8 +90,11 @@ def handle(request, response):
     if request.method == 'GET' and link:
         print("Redirecting: {} -> {}".format(shortlink, link['destination']))
 
-        response.status = HTTP_301
-        response.set_header('Location', link['destination'])
+        if link['destination'].startswith('192.168'):
+            return respond_internal_url(response, link['destination'])
+        else:
+            return respond_external_url(response, link['destination'])
+
     elif request.method == 'GET' and not link:
         # Trying to go link that doesnt exist yet. Give an option to create
         print("Trying to go to a link that doesnt exist yet. Here's an option to create")
