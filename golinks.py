@@ -8,6 +8,7 @@ from path import Path
 DB = Path('data/db.json')
 data = {}
 
+
 def read_db(filename):
     """
     Reads all linkdata from the file
@@ -15,6 +16,7 @@ def read_db(filename):
     values = json.load(filename.open('r'))
     print("Read {0} URLs".format(len(values.keys())))
     data.update(values)
+
 
 def get_all_links():
 
@@ -27,6 +29,7 @@ def find(shortlink):
     """
     return data.get(shortlink, {})
 
+
 def del_link(shortlink):
     """
     Removes a shortlink from the database
@@ -36,6 +39,7 @@ def del_link(shortlink):
 
     write_db(data)
     read_db(DB)
+
 
 def add_link(shortlink, destination, creator):
     """
@@ -51,6 +55,7 @@ def add_link(shortlink, destination, creator):
 
     write_db(data)
     read_db(DB)
+
 
 @hug.startup()
 def setup(api):
@@ -92,6 +97,7 @@ def respond_internal_url(response, destination):
     response.body = '''<html><head><script>window.location="http://{0}";</script></head><body>Redirecting to {0}</body></html>'''.format(
         destination)
 
+
 @hug.sink('/')
 def redirect_handler(request, response):
     """Main shortlink handler"""
@@ -124,23 +130,27 @@ def redirect_handler(request, response):
         # Trying to create a go link with no data. Error
         print("Trying to create a go link with no data. Error")
 
+
 @hug.get('/')
 def frontend_handler(request, response):
     response.content_type = falcon.MEDIA_HTML
     response.body = open('dist/index.html', 'r').read()
 
+
 @hug.static('/_admin')
 def frontend_assets_handler():
     return ("dist/",)
 
+
 @hug.get('/_api/allurls')
-def api_allurls_handler(request, response, cors: hug.directives.cors="*"):
+def api_allurls_handler(request, response, cors: hug.directives.cors = "*"):
 
     print(request)
     return get_all_links()
 
+
 @hug.get('/_api/delete/{shortlink}')
-def api_delete_url_handler(shortlink, request, response, cors: hug.directives.cors="*"):
+def api_delete_url_handler(shortlink, request, response, cors: hug.directives.cors = "*"):
 
     del_link(shortlink)
 

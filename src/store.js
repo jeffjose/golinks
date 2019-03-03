@@ -9,18 +9,20 @@ export default new Vuex.Store({
     urls: []
   },
   mutations: {
-    SET_URLS (state, urls){
+    SET_URLS(state, urls) {
       state.urls = urls
     }
   },
   actions: {
-    loadURLs({commit}) {
+    loadURLs({
+      commit
+    }) {
       axios.get('http://localhost:8000/_api/allurls')
-      .then(r => r.data)
-      .then(urls => {
-        console.log(urls)
-        commit('SET_URLS', urls)
-      })
+        .then(r => r.data)
+        .then(urls => {
+          console.log(urls)
+          commit('SET_URLS', urls)
+        })
     }
 
   }
