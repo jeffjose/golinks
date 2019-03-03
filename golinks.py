@@ -22,7 +22,7 @@ def read_db(filename):
 
 def get_all_links():
 
-    return [x for x in data.values()]
+    return sorted([x for x in data.values()], key = lambda x: x['created'], reverse = True)
 
 def shortlink_exists(shortlink):
 

@@ -15,7 +15,7 @@
          th
            span modified
          th
-           span actions
+           span
      tbody
        tr
          th
@@ -48,24 +48,24 @@
              span.icon(@click="add_link(newurl)", :class="{active: shortlinkok, inactive: !shortlinkok}")
                i.mdi.mdi-plus-circle.add
        tr(v-for="url in urls")
-         td
+         td.td-shortlink
            input.input-hidden(:ref="'input-' + url.shortlink", :value="'go/' + url.shortlink")
            span.golink(@click="copy(url.shortlink)")
              span.go go/
              span.shortlink {{url.shortlink}}
            span.icon.clipboard(@click="copy(url.shortlink)")
              i.mdi.mdi-clipboard-text
-         td
+         td.td-destination
            span.destination {{url.destination | shorten}}
-         td
+         td.td-creator
            span.creator {{url.creator}}
-         td
+         td.td-hits
            span.hits {{url.hits}}
-         td
+         td.td-created
            span.created {{url.created | from_now}}
-         td
+         td.td-modified
            span.modified {{url.modified | from_now}}
-         td.icons
+         td.icons.td-icons
            span.icon
              i.mdi.mdi-pencil.ed
            span.icon(@click="del_link(url)")
@@ -125,8 +125,8 @@ export default {
 
 
       if (shortlink.length > 0) {
-        //axios.get("_api/validate/" + shortlink)
-        axios.get("http://spectre:8000/_api/validate/" + shortlink)
+        axios.get("_api/validate/" + shortlink)
+        //axios.get("http://spectre:8000/_api/validate/" + shortlink)
           .then(r => r.data)
           .then(exists => {
               this.shortlinkexists = exists
@@ -145,6 +145,8 @@ export default {
 
       // If shortlink isnt unique
       if (!this.shortlinkok) {
+        this.$refs.shortlink.select();
+        this.$refs.shortlink.focus();
         return
       }
 
@@ -180,6 +182,15 @@ export default {
 
 @import "~bulma/sass/utilities/initial-variables";
 
+table
+  color: $grey-dark
+
+th, .td-creator, .td-hits, .td-created, .td-modified, .td-icons
+  text-align: center
+
+.td-icons, .icons
+  vertical-align: middle
+
 .go
   color: $grey-light
   font-size: 0.75rem
@@ -188,8 +199,8 @@ export default {
   font-weight: bold
 
 .destination:hover
-  border-bottom: 1px solid $turquoise
   cursor: pointer;
+  color: $black
 
 .ed, .del
   color: $grey-light
@@ -220,6 +231,9 @@ thead tr span, tbody tr span
 .icons span
    font-size: 1rem;
 
+// Increase the font size of only the plus button
+.add
+  font-size: 1.2rem
 
 .clipboard
   opacity: 0

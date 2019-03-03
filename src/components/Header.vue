@@ -1,5 +1,5 @@
 <template lang="pug">
-  nav.navbar.is-light(role="navigation", aria-label="main navigation")
+  nav.navbar.is-white(role="navigation", aria-label="main navigation")
      div.navbar-brand
        a.navbar-item(href="/")
          img(src="_admin/android-chrome-192x192.png", height=28)
@@ -35,4 +35,10 @@ export default {
 </script>
 
 <style scoped lang="sass">
+@import "~bulma/sass/utilities/initial-variables";
+
+.navbar a
+  font-size: 0.90rem;
+  color: $grey-dark !important
+
 </style>
