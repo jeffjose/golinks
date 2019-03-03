@@ -12,6 +12,7 @@
 
 // Customizations go here
 
+$table-cell-border-width: 0px;
 $family-sans-serif: 'Roboto', sans-serif;
 
 // 2. Import the rest of Bulma

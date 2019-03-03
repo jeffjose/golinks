@@ -1,5 +1,5 @@
 <template lang="pug">
-   table.table.is-fullwidth.is-hoverable
+   table.table.is-hoverable
      thead
        tr
          th
@@ -19,10 +19,8 @@
      tbody
        tr
          th
-           p.control.has-icons-left
-             input.input.is-small(ref="shortlink", type="text", placeholder="shortlink", v-model="newurl.shortlink", @keyup.enter="add_link(newurl)")
-             span.icon.is-small.is-left
-               i.mdi.mdi-link
+           p
+             input.input.is-small(ref="shortlink", type="text", placeholder="shortlink", @input="newurl.shortlink = golink2shortlink($event.target.value)", :value="golink", @keyup.enter="add_link(newurl)")
          th
            p.control.has-icons-left
              input.input.is-small(type="text", placeholder="URL to shorten", v-model="newurl.destination", @keyup.enter="add_link(newurl)")
@@ -34,18 +32,16 @@
              span.icon.is-small.is-left
                i.mdi.mdi-account
          th
-           p.control.has-icons-left
+           p
              input.input.is-small(disabled, type="text", placeholder="0")
-             span.icon.is-small.is-left
-               i.mdi.mdi-counter
          th
            p.control.has-icons-left
-             input.input.is-small(disabled, type="text", placeholder="-")
+             input.input.is-small(disabled, type="text", placeholder="right now")
              span.icon.is-small.is-left
                i.mdi.mdi-calendar-range
          th
            p.control.has-icons-left
-             input.input.is-small(disabled, type="text", placeholder="-")
+             input.input.is-small(disabled, type="text", placeholder="right now")
              span.icon.is-small.is-left
                i.mdi.mdi-calendar-range
          th.icons
@@ -56,8 +52,10 @@
            span.golink
              span.go go/
              span.shortlink {{url.shortlink}}
+           span.icon.clipboard
+             i.mdi.mdi-clipboard-text
          td
-           span.destination {{url.destination}}
+           span.destination {{url.destination | shorten}}
          td
            span.creator {{url.creator}}
          td
@@ -82,12 +80,12 @@ import _ from "lodash";
 export default {
   name: "LinkTable",
   mounted() {
-    this.$refs.shortlink.focus()
+    this.$refs.shortlink.focus();
   },
-  data: function(){
-  return {
-      newurl: {}
-    }
+  data: function() {
+    return {
+      newurl: {shortlink: ""}
+    };
   },
   props: {
     urls: Array
@@ -95,35 +93,50 @@ export default {
   filters: {
     from_now: function(date) {
       return moment(date).fromNow();
+    },
+        shorten: function(url) {
+                if(url.length > 30) {
+                          return url.substring(0,30) + "..."
+                        } else {
+                          return url
+                        }
+
+        },},
+  computed: {
+    golink: function(){
+      if(this.newurl.shortlink.length == 0) {
+        return "go/"
+      }else {
+      return "go/" + this.newurl.shortlink
+      }
     }
   },
   methods: {
-    add_link: function(){
-
+    golink2shortlink: function(str){
+      return str.replace(/^g/, '').replace(/^o/, '').replace(/^\//, '')
+    },
+    add_link: function() {
       // Only if these values are set
-      if (_.has(this.newurl, 'shortlink') && _.has(this.newurl, 'destination')) {
+      if (
+        _.has(this.newurl, "shortlink") &&
+        _.has(this.newurl, "destination")
+      ) {
+        axios
+          .post("_api/add/" + this.newurl.shortlink, this.newurl)
+          //.post("http://spectre:8000/_api/add/" + this.newurl.shortlink, this.newurl)
+          .then(function() {
+            this.$store.dispatch("loadURLs");
+            this.newurl = {shortlink: ""};
+          });
 
-      axios
-        .post("_api/add/" + this.newurl.shortlink, this.newurl)
-        //.post("http://spectre:8000/_api/add/" + this.newurl.shortlink, this.newurl)
-        .then(response => {
-          this.$store.dispatch("loadURLs");
-          this.newurl = {}
-        });
-
-      this.$refs.shortlink.focus()
-
-      }
-      else {
-      console.log("lol")
+        this.$refs.shortlink.focus();
       }
     },
     del_link: function(url) {
-      console.log("delete", url);
       axios
         .get("_api/delete/" + url.shortlink)
         //.get("http://spectre:8000/_api/delete/" + url.shortlink)
-        .then(response => {
+        .then(function() {
           this.$store.dispatch("loadURLs");
         });
     }
@@ -132,33 +145,37 @@ export default {
 </script>
 
 <style scoped lang="sass">
+
+@import "~bulma/sass/utilities/initial-variables";
+
 .go
-  color: #AAA
+  color: $grey-light
   font-size: 0.75rem
 
 .shortlink
   font-weight: bold
 
 .destination:hover, .golink:hover
-  border-bottom: 1px solid blue;
+  border-bottom: 1px solid $turquoise
   cursor: pointer;
 
 .ed, .del, .add
-  color: #D5D5D5
+  color: $grey-light
+  transition: $speed ease-in-out;
 
 tr:hover .del, tr:hover .ed, tr:hover .add
-    color: #AAA
+    color: $grey-dark
 
 .del:hover
-    color: #ff3d3d !important
+    color: $red !important
     cursor: pointer
 
 .ed:hover
-    color: #333333 !important
+    color: $grey-dark !important
     cursor: pointer
 
 .add:hover
-    color: green !important
+    color: $green !important
     cursor: pointer
 
 thead tr span, tbody tr span
@@ -166,6 +183,20 @@ thead tr span, tbody tr span
 
 .icons span
    font-size: 1rem;
+
+.clipboard
+  opacity: 0
+  transition: 50ms ease-in-out;
+  color: $grey-light
+
+.clipboard:hover
+    color: $grey-dark !important
+    cursor: pointer
+
+tr:hover .clipboard
+   opacity: 1;
+
+
 
 </style>
 
