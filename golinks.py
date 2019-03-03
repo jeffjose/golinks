@@ -122,8 +122,8 @@ def frontend_handler(request, response):
 def frontend_assets_handler():
     return ("dist/",)
 
-@hug.get('/_api/alllinks')
-def api_handler(request, response):
+@hug.get('/_api/allurls')
+def api_handler(request, response, cors: hug.directives.cors="*"):
 
     print(request)
     return get_all_links()

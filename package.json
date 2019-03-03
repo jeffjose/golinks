@@ -8,12 +8,13 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "vue": "^2.6.6",
-    "vue-router": "^3.0.2",
+    "axios": "^0.18.0",
     "bulma": "^0.7.2",
     "coffee-loader": "^0.9.0",
     "coffeescript": "^2.3.2",
-    "vue-cli-plugin-coffeescript": "^0.0.3"
+    "vue": "^2.6.6",
+    "vue-cli-plugin-coffeescript": "^0.0.3",
+    "vue-router": "^3.0.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.4.0",
@@ -22,8 +23,8 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^5.8.0",
     "eslint-plugin-vue": "^5.0.0",
-    "pug": "^2.0.3",
     "node-sass": "^4.11.0",
+    "pug": "^2.0.3",
     "pug-plain-loader": "^1.0.0",
     "sass-loader": "^7.1.0",
     "vue-template-compiler": "^2.5.21"
