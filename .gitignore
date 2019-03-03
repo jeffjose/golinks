@@ -3,7 +3,7 @@ data/
 .DS_Store
 .firebase
 node_modules
-/dist
+/_admin
 
 # local env files
 .env.local

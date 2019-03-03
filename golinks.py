@@ -112,10 +112,7 @@ def handle(request, response):
 
 @hug.static('/_admin')
 def admin_handlerx():
-    #response.content_type = falcon.MEDIA_HTML
-    #response.body = "foo"
-    return (".",)
-
+    return ("_admin",)
 
 # Some testing fixtures
 if __name__ == '__main__':
