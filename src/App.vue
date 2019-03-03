@@ -1,28 +1,18 @@
-<template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+<template lang="pug">
+  #app
+    router-view
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
+<style lang="sass">
+@import url("https://fonts.googleapis.com/css?family=Open+Sans");
 
-export default {
-  name: 'app',
-  components: {
-    HelloWorld
-  }
-}
-</script>
+// 1. Import the initial variables
+@import "~bulma/sass/utilities/initial-variables";
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+// Customizations go here
+
+$family-sans-serif: 'Roboto', sans-serif;
+
+// 2. Import the rest of Bulma
+@import "~bulma";
 </style>
