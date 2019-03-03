@@ -7,7 +7,7 @@
   export default {
     name: 'about',
     created () {
-      document.title = document.location.hostname;
+      document.title = "golinks for your home"
     }
   }
 </script>
