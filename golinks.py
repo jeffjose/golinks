@@ -24,6 +24,10 @@ def get_all_links():
 
     return [x for x in data.values()]
 
+def shortlink_exists(shortlink):
+
+    return shortlink in data
+
 
 def find(shortlink):
     """
@@ -187,7 +191,12 @@ def api_delete_url_handler(shortlink, request, response, cors: hug.directives.co
 @hug.post('/_api/add/{shortlink}')
 def api_add_url_handler(shortlink, body, request, response, cors: hug.directives.cors = "*"):
 
-    add_link(shortlink, body['destination'], body['creator'])
+    add_link(shortlink, body['destination'], body.get('creator', ''))
+
+@hug.get('/_api/validate/{shortlink}')
+def api_validate_shortlink_handler(shortlink, body, request, response, cors: hug.directives.cors = "*"):
+
+    return shortlink_exists(shortlink)
 
 
 # Some testing fixtures

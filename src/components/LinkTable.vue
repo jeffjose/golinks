@@ -20,7 +20,7 @@
        tr
          th
            p
-             input.input.is-small(ref="shortlink", type="text", placeholder="shortlink", @input="newurl.shortlink = golink2shortlink($event.target.value)", :value="golink", @keyup.enter="add_link(newurl)")
+             input.input.is-small(:class="{'is-danger': shortlinkexists, 'is-success': shortlinkok}" ref="shortlink", type="text", placeholder="shortlink", @input="newurl.shortlink = golink2shortlink($event.target.value)", :value="golink", @keyup.enter="add_link(newurl)")
          th
            p.control.has-icons-left
              input.input.is-small(type="text", placeholder="URL to shorten", v-model="newurl.destination", @keyup.enter="add_link(newurl)")
@@ -45,7 +45,7 @@
              span.icon.is-small.is-left
                i.mdi.mdi-calendar-range
          th.icons
-             span.icon(@click="add_link(newurl)")
+             span.icon(@click="add_link(newurl)", :class="{active: shortlinkok, inactive: !shortlinkok}")
                i.mdi.mdi-plus-circle.add
        tr(v-for="url in urls")
          td
@@ -85,7 +85,9 @@ export default {
   },
   data: function() {
     return {
-      newurl: {shortlink: ""}
+      newurl: {shortlink: ""},
+      shortlinkexists: false,
+      shortlinkok: false
     };
   },
   props: {
@@ -118,9 +120,34 @@ export default {
       document.execCommand('copy')
     },
     golink2shortlink: function(str){
-      return str.replace(/^g/, '').replace(/^o/, '').replace(/^\//, '')
+
+      var shortlink =  str.replace(/^g/, '').replace(/^o/, '').replace(/^\//, '')
+
+
+      if (shortlink.length > 0) {
+        //axios.get("_api/validate/" + shortlink)
+        axios.get("http://spectre:8000/_api/validate/" + shortlink)
+          .then(r => r.data)
+          .then(exists => {
+              this.shortlinkexists = exists
+              this.shortlinkok = !exists
+          })
+
+      }
+      else {
+        this.shortlinkexists = false
+        this.shortlinkok = false
+      }
+
+      return shortlink
     },
     add_link: function() {
+
+      // If shortlink isnt unique
+      if (!this.shortlinkok) {
+        return
+      }
+
       // Only if these values are set
       if (
         _.has(this.newurl, "shortlink") &&
@@ -164,11 +191,19 @@ export default {
   border-bottom: 1px solid $turquoise
   cursor: pointer;
 
-.ed, .del, .add
+.ed, .del
   color: $grey-light
   transition: $speed ease-in-out;
 
-tr:hover .del, tr:hover .ed, tr:hover .add
+.icons .active
+  cursor: pointer
+  color: $green !important
+
+.icons .inactive
+  cursor: default
+  color: $grey-lighter !important
+
+tr:hover .del, tr:hover .ed
     color: $grey-dark
 
 .del:hover
@@ -179,15 +214,12 @@ tr:hover .del, tr:hover .ed, tr:hover .add
     color: $grey-dark !important
     cursor: pointer
 
-.add:hover
-    color: $green !important
-    cursor: pointer
-
 thead tr span, tbody tr span
    font-size: 0.75rem;
 
 .icons span
    font-size: 1rem;
+
 
 .clipboard
   opacity: 0
