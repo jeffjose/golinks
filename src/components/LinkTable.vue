@@ -129,7 +129,7 @@ export default {
         axios
           .post("_api/add/" + this.newurl.shortlink, this.newurl)
           //.post("http://spectre:8000/_api/add/" + this.newurl.shortlink, this.newurl)
-          .then(function() {
+          .then(response => {
             this.$store.dispatch("loadURLs");
             this.newurl = {shortlink: ""};
           });
@@ -141,7 +141,7 @@ export default {
       axios
         .get("_api/delete/" + url.shortlink)
         //.get("http://spectre:8000/_api/delete/" + url.shortlink)
-        .then(function() {
+        .then(response => {
           this.$store.dispatch("loadURLs");
         });
     }
