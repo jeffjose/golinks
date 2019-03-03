@@ -2,15 +2,15 @@
   div
     Header
     section.section
-      h1.title All links
-
       div.columns
         .column.is-full
           LinkTable(:urls="urls")
 
 </template>
 <script>
+
   import axios from 'axios'
+
   import Header from '@/components/Header.vue'
   import LinkTable from '@/components/LinkTable.vue'
 
@@ -19,7 +19,7 @@
     data () {
 
       return {
-        urls: {}
+        urls: []
       }
 
     },
