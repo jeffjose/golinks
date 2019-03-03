@@ -20,7 +20,7 @@
        tr
          th
            p.control.has-icons-left
-             input.input.is-small(type="text", placeholder="shortlink", v-model="newurl.shortlink", @keyup.enter="add_link(newurl)")
+             input.input.is-small(ref="shortlink", type="text", placeholder="shortlink", v-model="newurl.shortlink", @keyup.enter="add_link(newurl)")
              span.icon.is-small.is-left
                i.mdi.mdi-link
          th
@@ -81,8 +81,10 @@ import _ from "lodash";
 
 export default {
   name: "LinkTable",
+  mounted() {
+    this.$refs.shortlink.focus()
+  },
   data: function(){
-
   return {
       newurl: {}
     }
@@ -108,6 +110,8 @@ export default {
           this.$store.dispatch("loadURLs");
           this.newurl = {}
         });
+
+      this.$refs.shortlink.focus()
 
       }
       else {
