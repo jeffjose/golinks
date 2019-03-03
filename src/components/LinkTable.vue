@@ -49,7 +49,7 @@
                i.mdi.mdi-plus-circle.add
        tr(v-for="url in urls")
          td
-           input(hidden, :ref="'input-' + url.shortlink", :value="'go/' + url.shortlink")
+           input.input-hidden(:ref="'input-' + url.shortlink", :value="'go/' + url.shortlink")
            span.golink(@click="copy(url.shortlink)")
              span.go go/
              span.shortlink {{url.shortlink}}
@@ -207,5 +207,11 @@ table
 .golink
   cursor: pointer
 
+  // Make the input as small as possible, but still allowing for copying
+.input-hidden
+  width: 1px
+  height: 1px
+  border: 0px
+  opacity: 0
 </style>
 
