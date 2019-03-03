@@ -49,10 +49,11 @@
                i.mdi.mdi-plus-circle.add
        tr(v-for="url in urls")
          td
-           span.golink
+           input(hidden, :ref="'input-' + url.shortlink", :value="'go/' + url.shortlink")
+           span.golink(@click="copy(url.shortlink)")
              span.go go/
              span.shortlink {{url.shortlink}}
-           span.icon.clipboard
+           span.icon.clipboard(@click="copy(url.shortlink)")
              i.mdi.mdi-clipboard-text
          td
            span.destination {{url.destination | shorten}}
@@ -94,14 +95,14 @@ export default {
     from_now: function(date) {
       return moment(date).fromNow();
     },
-        shorten: function(url) {
-                if(url.length > 30) {
-                          return url.substring(0,30) + "..."
-                        } else {
-                          return url
-                        }
+    shorten: function(url) {
+      if(url.length > 30) {
+        return url.substring(0,30) + "..."
+      } else {
+        return url
+      }
 
-        },},
+    },},
   computed: {
     golink: function(){
       if(this.newurl.shortlink.length == 0) {
@@ -112,6 +113,10 @@ export default {
     }
   },
   methods: {
+    copy: function(val){
+      this.$refs["input-"+val][0].select()
+      document.execCommand('copy')
+    },
     golink2shortlink: function(str){
       return str.replace(/^g/, '').replace(/^o/, '').replace(/^\//, '')
     },
@@ -155,7 +160,7 @@ export default {
 .shortlink
   font-weight: bold
 
-.destination:hover, .golink:hover
+.destination:hover
   border-bottom: 1px solid $turquoise
   cursor: pointer;
 
@@ -196,7 +201,11 @@ thead tr span, tbody tr span
 tr:hover .clipboard
    opacity: 1;
 
+table
+  cursor: default
 
+.golink
+  cursor: pointer
 
 </style>
 
