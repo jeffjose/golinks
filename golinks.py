@@ -10,6 +10,7 @@ from path import Path
 DB = Path('data/db.json')
 data = {}
 
+
 def read_db(filename):
     """
     Reads all linkdata from the file
@@ -41,9 +42,11 @@ def del_link(shortlink):
     write_db(data)
     read_db(DB)
 
+
 def timenow():
 
     return datetime.datetime.now(datetime.timezone.utc).isoformat()
+
 
 def add_link(shortlink, destination, creator):
     """
@@ -86,6 +89,7 @@ def update_stats(link):
 
     write_db(data)
     read_db(DB)
+
 
 def write_db(data):
     """
@@ -180,10 +184,12 @@ def api_delete_url_handler(shortlink, request, response, cors: hug.directives.co
 
     del_link(shortlink)
 
+
 @hug.post('/_api/add/{shortlink}')
 def api_add_url_handler(shortlink, body, request, response, cors: hug.directives.cors = "*"):
 
     add_link(shortlink, body['destination'], body['creator'])
+
 
 # Some testing fixtures
 if __name__ == '__main__':
