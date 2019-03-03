@@ -13,6 +13,7 @@
          div.navbar-start
            a.navbar-item Home
            a.navbar-item Stats
+           a.navbar-item Source
            a.navbar-item About
        //    div.navbar-item.has-dropdown.is-hoverable
        //      a.navbar-link More
