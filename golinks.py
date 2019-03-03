@@ -12,7 +12,9 @@ def read_db(filename):
     """
     Reads all linkdata from the file
     """
-    return json.load(filename.open('r'))
+    values = json.load(filename.open('r'))
+    print("Read {0} URLs".format(len(values.keys())))
+    data.update(values)
 
 def get_all_links():
 
@@ -25,6 +27,15 @@ def find(shortlink):
     """
     return data.get(shortlink, {})
 
+def del_link(shortlink):
+    """
+    Removes a shortlink from the database
+    """
+    if shortlink in data:
+        data.pop(shortlink)
+
+    write_db(data)
+    read_db(DB)
 
 def add_link(shortlink, destination, creator):
     """
@@ -39,7 +50,7 @@ def add_link(shortlink, destination, creator):
     data[shortlink] = values
 
     write_db(data)
-
+    read_db(DB)
 
 @hug.startup()
 def setup(api):
@@ -51,7 +62,7 @@ def setup(api):
     if not DB.exists():
         DB.write_lines(["{}"])
 
-    data.update(read_db(DB))
+    read_db(DB)
 
 
 def write_db(data):
@@ -123,10 +134,15 @@ def frontend_assets_handler():
     return ("dist/",)
 
 @hug.get('/_api/allurls')
-def api_handler(request, response, cors: hug.directives.cors="*"):
+def api_allurls_handler(request, response, cors: hug.directives.cors="*"):
 
     print(request)
     return get_all_links()
+
+@hug.get('/_api/delete/{shortlink}')
+def api_delete_url_handler(shortlink, request, response, cors: hug.directives.cors="*"):
+
+    del_link(shortlink)
 
 
 # Some testing fixtures

@@ -42,16 +42,31 @@
          td.icons
            span.icon
              i.mdi.mdi-pencil.ed
-           span.icon
+           span.icon(@click="deleteLink(url)")
              i.mdi.mdi-delete.del
 
 </template>
 <script>
 
+  import axios from 'axios'
+
+import _ from 'lodash'
+
 export default {
   name: 'LinkTable',
   props: {
     urls: Array
+  },
+  methods: {
+    deleteLink: function(url) {
+      console.log("delete", url);
+      axios.get('http://localhost:8000/_api/delete/' + url.shortlink).then(response => {
+
+        this.$store.dispatch('loadURLs')
+
+
+      })
+    }
   }
 }
 </script>

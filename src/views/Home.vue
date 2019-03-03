@@ -9,27 +9,19 @@
 </template>
 <script>
 
-  import axios from 'axios'
+import {mapState } from 'vuex'
 
   import Header from '@/components/Header.vue'
   import LinkTable from '@/components/LinkTable.vue'
 
   export default {
     name: 'home',
-    data () {
-
-      return {
-        urls: []
-      }
-
-    },
     mounted() {
-      axios
-        .get('http://localhost:8000/_api/allurls')
-        .then(response => {
-          this.urls = response.data
-        })
+      this.$store.dispatch('loadURLs')
     },
+    computed: mapState([
+      'urls'
+    ]),
     created () {
       document.title = document.location.hostname;
     },
