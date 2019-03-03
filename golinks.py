@@ -3,12 +3,12 @@ import simplejson as json
 from urllib import parse
 
 import falcon
+import datetime
 
 from path import Path
 
 DB = Path('data/db.json')
 data = {}
-
 
 def read_db(filename):
     """
@@ -41,6 +41,9 @@ def del_link(shortlink):
     write_db(data)
     read_db(DB)
 
+def timenow():
+
+    return datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 def add_link(shortlink, destination, creator):
     """
@@ -49,7 +52,10 @@ def add_link(shortlink, destination, creator):
     values = {
         'shortlink': shortlink,
         'destination': destination,
-        'creator': creator
+        'creator': creator,
+        'hits': 0,
+        'created': timenow(),
+        'modified': timenow(),
     }
 
     data[shortlink] = values
@@ -70,6 +76,16 @@ def setup(api):
 
     read_db(DB)
 
+
+def update_stats(link):
+
+    link['hits'] = link.get('hits', 0) + 1
+    link['modified'] = timenow()
+
+    data[link['shortlink']] = link
+
+    write_db(data)
+    read_db(DB)
 
 def write_db(data):
     """
@@ -119,8 +135,10 @@ def redirect_handler(request, response):
         print("Redirecting: {} -> {}".format(shortlink, link['destination']))
 
         if link['destination'].startswith('192.168'):
+            update_stats(link)
             return respond_internal_url(response, link['destination'])
         else:
+            update_stats(link)
             return respond_external_url(response, link['destination'])
 
     elif request.method == 'GET' and not link:
@@ -162,6 +180,10 @@ def api_delete_url_handler(shortlink, request, response, cors: hug.directives.co
 
     del_link(shortlink)
 
+@hug.post('/_api/add/{shortlink}')
+def api_add_url_handler(shortlink, body, request, response, cors: hug.directives.cors = "*"):
+
+    add_link(shortlink, body['destination'], body['creator'])
 
 # Some testing fixtures
 if __name__ == '__main__':

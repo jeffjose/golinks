@@ -12,6 +12,7 @@
     "bulma": "^0.7.2",
     "coffee-loader": "^0.9.0",
     "coffeescript": "^2.3.2",
+    "moment-timezone": "^0.5.23",
     "vue": "^2.6.6",
     "vue-cli-plugin-coffeescript": "^0.0.3",
     "vue-router": "^3.0.2"

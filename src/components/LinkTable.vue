@@ -9,27 +9,48 @@
          th
            span creator
          th
+           span hits
+         th
+           span created
+         th
+           span modified
+         th
            span actions
      tbody
        tr
          th
            p.control.has-icons-left
-             input.input.is-small(type="text", placeholder="shortlink")
+             input.input.is-small(type="text", placeholder="shortlink", v-model="newurl.shortlink", @keyup.enter="add_link(newurl)")
              span.icon.is-small.is-left
                i.mdi.mdi-link
          th
            p.control.has-icons-left
-             input.input.is-small(type="text", placeholder="URL to shorten")
+             input.input.is-small(type="text", placeholder="URL to shorten", v-model="newurl.destination", @keyup.enter="add_link(newurl)")
              span.icon.is-small.is-left
                i.mdi.mdi-link
          th
            p.control.has-icons-left
-             input.input.is-small(type="text", placeholder="User")
+             input.input.is-small(type="text", placeholder="User", v-model="newurl.creator", @keyup.enter="add_link(newurl)")
              span.icon.is-small.is-left
                i.mdi.mdi-account
+         th
+           p.control.has-icons-left
+             input.input.is-small(disabled, type="text", placeholder="0")
+             span.icon.is-small.is-left
+               i.mdi.mdi-counter
+         th
+           p.control.has-icons-left
+             input.input.is-small(disabled, type="text", placeholder="-")
+             span.icon.is-small.is-left
+               i.mdi.mdi-calendar-range
+         th
+           p.control.has-icons-left
+             input.input.is-small(disabled, type="text", placeholder="-")
+             span.icon.is-small.is-left
+               i.mdi.mdi-calendar-range
          th.icons
-           span.icon
-             i.mdi.mdi-link-plus.add
+             span.icon(@click="add_link(newurl)")
+               i.mdi.mdi-plus-circle.add
        tr(v-for="url in urls")
          td
            span.golink
@@ -39,28 +60,65 @@
            span.destination {{url.destination}}
          td
            span.creator {{url.creator}}
+         td
+           span.hits {{url.hits}}
+         td
+           span.created {{url.created | from_now}}
+         td
+           span.modified {{url.modified | from_now}}
          td.icons
            span.icon
              i.mdi.mdi-pencil.ed
-           span.icon(@click="deleteLink(url)")
+           span.icon(@click="del_link(url)")
              i.mdi.mdi-delete.del
 
 </template>
 <script>
 import axios from "axios";
+import moment from "moment";
 
 import _ from "lodash";
 
 export default {
   name: "LinkTable",
+  data: function(){
+
+  return {
+      newurl: {}
+    }
+  },
   props: {
     urls: Array
   },
+  filters: {
+    from_now: function(date) {
+      return moment(date).fromNow();
+    }
+  },
   methods: {
-    deleteLink: function(url) {
+    add_link: function(){
+
+      // Only if these values are set
+      if (_.has(this.newurl, 'shortlink') && _.has(this.newurl, 'destination')) {
+
+      axios
+        .post("_api/add/" + this.newurl.shortlink, this.newurl)
+        //.post("http://spectre:8000/_api/add/" + this.newurl.shortlink, this.newurl)
+        .then(response => {
+          this.$store.dispatch("loadURLs");
+          this.newurl = {}
+        });
+
+      }
+      else {
+      console.log("lol")
+      }
+    },
+    del_link: function(url) {
       console.log("delete", url);
       axios
         .get("_api/delete/" + url.shortlink)
+        //.get("http://spectre:8000/_api/delete/" + url.shortlink)
         .then(response => {
           this.$store.dispatch("loadURLs");
         });
