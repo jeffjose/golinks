@@ -1,5 +1,6 @@
 import hug
 import simplejson as json
+from urllib import parse
 
 import falcon
 
@@ -82,9 +83,16 @@ def respond_external_url(response, destination):
     Use 301 to redirect regular URLs
     """
 
+    url = parse.urlparse(destination)
+
+    if not url.scheme:
+        fulldestination = "http://%s" % destination
+    else:
+        fulldestination = destination
+
     #response.status = falcon.HTTP_301
     response.status = falcon.HTTP_302
-    response.set_header('Location', destination)
+    response.set_header('Location', fulldestination)
 
 
 def respond_internal_url(response, destination):

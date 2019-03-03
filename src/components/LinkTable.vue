@@ -60,7 +60,7 @@ export default {
     deleteLink: function(url) {
       console.log("delete", url);
       axios
-        .get("http://localhost:8000/_api/delete/" + url.shortlink)
+        .get("_api/delete/" + url.shortlink)
         .then(response => {
           this.$store.dispatch("loadURLs");
         });

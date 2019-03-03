@@ -17,7 +17,7 @@ export default new Vuex.Store({
     loadURLs({
       commit
     }) {
-      axios.get('http://localhost:8000/_api/allurls')
+      axios.get('_api/allurls')
         .then(r => r.data)
         .then(urls => {
           console.log(urls)

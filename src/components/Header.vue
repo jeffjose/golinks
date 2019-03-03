@@ -2,7 +2,7 @@
   nav.navbar.is-light(role="navigation", aria-label="main navigation")
      div.navbar-brand
        a.navbar-item(href="/")
-         img(src="http://localhost:8000/_admin/android-chrome-192x192.png", height=28)
+         img(src="_admin/android-chrome-192x192.png", height=28)
 
        a.navbar-burger.burger(role="button", aria-label="menu", aria-expanded="false", data-target="navbarBasic")
          span(aria-hidden="true")
