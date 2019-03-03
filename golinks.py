@@ -8,12 +8,15 @@ from path import Path
 DB = Path('data/db.json')
 data = {}
 
-
 def read_db(filename):
     """
     Reads all linkdata from the file
     """
     return json.load(filename.open('r'))
+
+def get_all_links():
+
+    return [x for x in data.values()]
 
 
 def find(shortlink):
@@ -79,7 +82,7 @@ def respond_internal_url(response, destination):
         destination)
 
 @hug.sink('/')
-def handle(request, response):
+def redirect_handler(request, response):
     """Main shortlink handler"""
     shortlink = request.path.lstrip('/')
 
@@ -111,13 +114,20 @@ def handle(request, response):
         print("Trying to create a go link with no data. Error")
 
 @hug.get('/')
-def admin_handler(request, response):
+def frontend_handler(request, response):
     response.content_type = falcon.MEDIA_HTML
     response.body = open('dist/index.html', 'r').read()
 
 @hug.static('/_admin')
-def admin_handler():
+def frontend_assets_handler():
     return ("dist/",)
+
+@hug.get('/_api/alllinks')
+def api_handler(request, response):
+
+    print(request)
+    return get_all_links()
+
 
 # Some testing fixtures
 if __name__ == '__main__':

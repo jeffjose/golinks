@@ -1,14 +1,18 @@
 <template lang="pug">
   div
-    router-link(:to="{name:'about'}") about
-    section.hero.is-fullheight.welcome
-      .hero-body
-        .container
-          p.title golinks
+    Header
+    section.section
+      h1.title All links
+
+
+      div.columns
+        .column.is-full
+          LinkTable
 
 </template>
 <script>
   import Header from '@/components/Header.vue'
+  import LinkTable from '@/components/LinkTable.vue'
 
   export default {
     name: 'home',
@@ -17,6 +21,7 @@
     },
     components: {
       Header,
+      LinkTable,
     }
   }
 </script>
