@@ -111,8 +111,8 @@ def handle(request, response):
         print("Trying to create a go link with no data. Error")
 
 @hug.static('/_admin')
-def admin_handlerx():
-    return ("_admin",)
+def admin_handler():
+    return ("dist",)
 
 # Some testing fixtures
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 module.exports = {
   publicPath: '_admin/',
-  outputDir: '_admin',
+  outputDir: 'dist/',
   assetsDir: undefined,
   runtimeCompiler: undefined,
   productionSourceMap: undefined,
