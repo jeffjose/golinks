@@ -11,9 +11,8 @@
 
        div#navbarBasic.navbar-menu
          div.navbar-start
-           a.navbar-item Home
-           a.navbar-item Stats
-           a.navbar-item Source
+           a.navbar-item(href="/") Home
+           a.navbar-item(href="https://github.com/jeffjose/golinks") Source
            a.navbar-item About
        //    div.navbar-item.has-dropdown.is-hoverable
        //      a.navbar-link More
