@@ -3,6 +3,8 @@
      thead
        tr
          th
+           span
+         th
            span link
          th
            span URL
@@ -18,6 +20,7 @@
            span
      tbody
        tr
+         th
          th
            p
              input.input.is-small(:class="{'is-danger': newurl.shortlinkexists, 'is-success': newurl.shortlinkok}" ref="shortlink", type="text", placeholder="shortlink", @input="newurl.shortlink = golink2shortlink($event.target.value, newurl)", :value="shortlink2golink(newurl.shortlink)", @keyup.enter="add(newurl)")
@@ -48,6 +51,8 @@
              span.icon(@click="add(newurl)", :class="{active: newurl.shortlinkok, inactive: !newurl.shortlinkok}")
                i.mdi.mdi-plus-circle.add
        tr(v-for="url in urls")
+         td.selector
+           input.checkbox(type="checkbox")
          td.td-shortlink
            div(v-if="!url.editMode")
              input.input-hidden(:ref="'input-' + url.shortlink", :value="'go/' + url.shortlink")
@@ -231,8 +236,9 @@ table
 th, .td-creator, .td-hits, .td-created, .td-modified, .td-icons
   text-align: center
 
-.td-icons, .icons
+table td
   vertical-align: middle
+  padding: 0px;
 
 .go
   color: $grey-light
@@ -306,5 +312,9 @@ table
   height: 1px
   border: 0px
   opacity: 0
+
+.selector
+  padding-top: 7px;
+  padding-right: 5px;
 </style>
 
