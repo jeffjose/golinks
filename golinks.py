@@ -43,7 +43,7 @@ def read_db(aliases = ALIASESPATH, stats = STATSPATH):
 
 def get_all_links():
 
-    return sorted([x for x in data.values()], key = lambda x: x.get('created', timenow()), reverse = True)
+    return sorted([x for x in data.values()], key = lambda x: x.get('modified', timenow()), reverse = True)
 
 def shortlink_exists(shortlink):
 
