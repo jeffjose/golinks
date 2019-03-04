@@ -2,11 +2,10 @@
   div
    div.buttonbar
      button.button.is-small
-       input.checkbox(type="checkbox")
-     button.button.is-small(@click="reload()")
-         i.mdi.mdi-reload
-     button.button.is-danger.is-small
-       span.icon
+         i.mdi(@click="toggleselectall()", :class="{'mdi-checkbox-blank-outline': !selectall, 'mdi-checkbox-marked': selectall}")
+     button.button.is-small.refreshing(@click="refreshing = true; reload()")
+         i.mdi(:class="{'mdi-reload': !refreshing, 'mdi-progress-clock': refreshing}")
+     button.button.is-small
          i.mdi.mdi-delete
 
    table.table.is-hoverable
@@ -60,31 +59,33 @@
          th.icons
              span.icon(@click="add(newurl)", :class="{active: newurl.shortlinkok, inactive: !newurl.shortlinkok}")
                i.mdi.mdi-plus-circle.add
-       tr(v-for="url in urls")
+       tr(v-for="url in urls", :class="{'is-selected': url.selected}")
          td.selector
-           input.checkbox(type="checkbox")
+           //input.checkbox(v-model="url.selected", type="checkbox")
+           span.icon(@click="url.selected = !url.selected")
+             i.mdi(:class="{'mdi-checkbox-blank-outline': !url.selected, 'mdi-checkbox-marked': url.selected}")
          td.td-shortlink
-           div(v-if="!url.editMode")
+           div.shortlinkwrapper(v-if="!url.editMode")
              input.input-hidden(:ref="'input-' + url.shortlink", :value="'go/' + url.shortlink")
              span.golink(@click="copy(url.shortlink)")
                span.go go/
                span.shortlink {{url.shortlink}}
              span.icon.clipboard(@click="copy(url.shortlink)")
                i.mdi.mdi-clipboard-text
-           input.input.is-small.is-info(v-if="url.editMode", :class="{'is-danger': url.shortlinkexists, 'is-success': url.shortlinkok}", :ref="'shortlink-' + url.shortlink", type="text", placeholder="shortlink", @input="url.shortlink = golink2shortlink($event.target.value, url)", :value="shortlink2golink(url.shortlink)", @keyup.enter="edit(url)")
+           input.input.is-small(v-if="url.editMode", :class="{'is-danger': url.shortlinkexists, 'is-success': url.shortlinkok}", :ref="'shortlink-' + url.shortlink", type="text", placeholder="shortlink", @input="url.shortlink = golink2shortlink($event.target.value, url)", :value="shortlink2golink(url.shortlink)", @keyup.enter="edit(url)")
          td.td-destination
            span.destination(v-if="!url.editMode") {{url.destination | shorten}}
-           p.control.has-icons-left
-             input.input.is-small.is-info(v-if="url.editMode", type="text", v-model="url.destination", @keyup.enter="edit(url)", placeholder="URL to shorten")
+           p.control.has-icons-left(v-if="url.editMode")
+             input.input.is-small(type="text", v-model="url.destination", @keyup.enter="edit(url)", placeholder="URL to shorten")
              span.icon.is-small.is-left
                i.mdi.mdi-link
          td.td-creator
            span.creator {{url.creator}}
-           //input.input.is-small.is-info(type="text", :value="url.creator")
+           //input.input.is-small(type="text", :value="url.creator")
          td.td-hits
            span.hits {{url.hits}}
            //span.hits(v-if="!url.editMode") {{url.hits}}
-           //input.input.is-small.is-info(v-if="url.editMode", disabled, type="text", :value="url.hits")
+           //input.input.is-small(v-if="url.editMode", disabled, type="text", :value="url.hits")
          td.td-created
            span.created {{url.created | from_now}}
            //span.created(v-if="!url.editMode") {{url.created | from_now}}
@@ -95,7 +96,7 @@
            //input.input.is-small.is-info(v-if="url.editMode", disabled, type="text", placeholder="right now")
          td.icons.td-icons
            span.icon(@click="url.editMode = true")
-             i.mdi.ed(:class="{'mdi-pencil': !url.editMode, 'mdi-check active': url.editMode}")
+             i.mdi.ed(:class="{'mdi-pencil': !url.editMode, 'mdi-content-save active': url.editMode}")
            span.icon(@click="del(url)")
              i.mdi.mdi-delete.del
 
@@ -113,6 +114,8 @@ export default {
   data: function() {
     return {
       newurl: {shortlink: "", shortlinkexists: false, shortlinkok: false},
+      selectall: false,
+      refreshing:false
     };
   },
   props: {
@@ -131,6 +134,12 @@ export default {
 
     },},
   methods: {
+    toggleselectall: function(){
+
+      this.urls.forEach(function(x) {x.selected  = !x.selected})
+
+      this.selectall = !this.selectall
+    },
     focus: function(ref) {
       this.$refs[ref].focus()
     },
@@ -142,7 +151,15 @@ export default {
       }
     },
     reload: function() {
-      this.$store.dispatch("forceRefresh");
+      this.$store.dispatch("forceRefresh").then(response => {
+
+        setTimeout( () => {
+        this.refreshing = false
+
+        }, 300)
+      }
+
+      )
     },
     edit: function(url) {
 
@@ -229,7 +246,6 @@ export default {
     del: function(url) {
       axios
         .get("_api/delete/" + url.shortlink)
-        //.get("http://spectre:8000/_api/delete/" + url.shortlink)
         .then(response => {
           this.$store.dispatch("loadURLs");
         });
@@ -250,18 +266,21 @@ th, .td-creator, .td-hits, .td-created, .td-modified, .td-icons
 
 table td
   vertical-align: middle
-  padding: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
 
 .go
   color: $grey-light
   font-size: 0.75rem
+
+.is-selected .go
+  color: $white
 
 .shortlink
   font-weight: bold
 
 .destination:hover
   cursor: pointer;
-  color: $black
 
 .ed, .del
   color: $grey-light
@@ -275,9 +294,6 @@ table td
   cursor: default
   color: $grey-lighter !important
 
-tr:hover .del, tr:hover .ed
-    color: $grey-dark
-
 .del:hover
     color: $red !important
     cursor: pointer
@@ -289,6 +305,9 @@ tr:hover .del, tr:hover .ed
 .ed.active:hover
     color: $green !important
     cursor: pointer
+
+.is-selected .ed, .is-selected .del
+    color: $white;
 
 thead tr span, tbody tr span
    font-size: 0.75rem;
@@ -305,8 +324,11 @@ thead tr span, tbody tr span
   transition: 50ms ease-in-out;
   color: $grey-light
 
+.is-selected .clipboard
+  color: $white
+
 .clipboard:hover
-    color: $grey-dark !important
+    color: $grey-darker !important
     cursor: pointer
 
 tr:hover .clipboard
@@ -325,8 +347,34 @@ table
   border: 0px
   opacity: 0
 
-.selector
-  padding-top: 7px;
-  padding-right: 5px;
+.selector i
+  color: $grey
+  font-size: 1.3em
+  cursor: pointer;
+
+.selector i:hover
+  color: $grey-darker
+
+.is-selected .selector i
+  color: $grey-darker
+
+.shortlinkwrapper
+    margin-top: -2px;
+
+.buttonbar button
+  border: 0
+  color: $grey
+
+.buttonbar button i
+  font-size: 1.3em
+
+.buttonbar button:hover
+  background-color: $white-ter
+  color: $grey-darker
+
+.buttonbar button:focus, .buttonbar button:active
+  outline: none
+  box-shadow: none
+
 </style>
 

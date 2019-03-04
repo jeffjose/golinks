@@ -21,8 +21,8 @@ export default new Vuex.Store({
     loadURLs({
       commit
     }) {
-      //axios.get('_api/allurls')
-      axios.get('http://spectre:8000/_api/allurls')
+      axios.get('_api/allurls')
+     // axios.get('http://spectre:8000/_api/allurls')
         .then(r => r.data)
         .then(urls => {
           urls.forEach(function(x) {
@@ -32,6 +32,7 @@ export default new Vuex.Store({
             x.editMode = false
             x.origshortlink = x.shortlink
             x.origdestination = x.destination
+            x.selected = false
 
           })
           commit('SET_URLS', urls)
@@ -41,8 +42,8 @@ export default new Vuex.Store({
     forceRefresh({
       commit
     }) {
-      //axios.get('_api/refresh')
-      axios.get('http://spectre:8000/_api/refresh')
+      axios.get('_api/refresh')
+      //axios.get('http://spectre:8000/_api/refresh')
         .then(r => r.data)
         .then(urls => {
           urls.forEach(function(x) {
@@ -52,6 +53,7 @@ export default new Vuex.Store({
             x.editMode = false
             x.origshortlink = x.shortlink
             x.origdestination = x.destination
+            x.selected = false
 
           })
           commit('SET_URLS', urls)
