@@ -7,22 +7,43 @@ import datetime
 
 from path import Path
 
-DB = Path('data/db.json')
+STATSPATH = Path('data/stats')
+ALIASESPATH = Path('data/aliases')
 data = {}
 
 
-def read_db(filename):
+def read_db(aliases = ALIASESPATH, stats = STATSPATH):
     """
     Reads all linkdata from the file
     """
-    values = json.load(filename.open('r'))
+    statsvalues = json.load(stats.open('r'))
+
+    aliasesheaders = ['shortlink', 'destination']
+    # Convert the following format into server format
+    # Input
+    #   g google.com
+    #
+    # Output
+    #  [{'shortlink': 'g', 'destination': 'google.com'}]
+    #
+    aliasesvalues = [dict(zip(aliasesheaders, x.split())) for x in aliases.lines(retain = False)]
+
+    values = {}
+    for aliases in aliasesvalues:
+
+        shortlink = aliases['shortlink']
+
+        values[shortlink] = aliases
+
+        aliases.update(statsvalues.get(shortlink, {}))
+
     print("Read {0} URLs".format(len(values.keys())))
     data.update(values)
 
 
 def get_all_links():
 
-    return sorted([x for x in data.values()], key = lambda x: x['created'], reverse = True)
+    return sorted([x for x in data.values()], key = lambda x: x.get('created', timenow()), reverse = True)
 
 def shortlink_exists(shortlink):
 
@@ -44,7 +65,7 @@ def del_link(shortlink):
         data.pop(shortlink)
 
     write_db(data)
-    read_db(DB)
+    read_db()
 
 
 def timenow():
@@ -68,7 +89,7 @@ def add_link(shortlink, destination, creator):
     data[shortlink] = values
 
     write_db(data)
-    read_db(DB)
+    read_db()
 
 def edit_link(shortlink, values):
     """
@@ -86,7 +107,7 @@ def edit_link(shortlink, values):
     data[shortlink] = origvalues
 
     write_db(data)
-    read_db(DB)
+    read_db()
 
 
 @hug.startup()
@@ -96,10 +117,13 @@ def setup(api):
     """
     Path('data').mkdir_p()
 
-    if not DB.exists():
-        DB.write_lines(["{}"])
+    if not STATSPATH.exists():
+        STATSPATH.write_lines(["{}"])
 
-    read_db(DB)
+    if not ALIASESPATH.exists():
+        ALIASESPATH.write_lines([])
+
+    read_db()
 
 
 def update_stats(link):
@@ -110,14 +134,23 @@ def update_stats(link):
     data[link['shortlink']] = link
 
     write_db(data)
-    read_db(DB)
+    read_db()
 
 
 def write_db(data):
     """
     Handles writing of data to database
     """
-    json.dump(data, open(DB, 'w'))
+
+    aliaseslinetemplate = "{shortlink} {destination}"
+
+    aliases = [aliaseslinetemplate.format_map(x) for x in data.values()]
+
+    # Return value doesnt matter.
+    [(x.pop('shortlink'), x.pop('destination')) for x in data.values()]
+
+    ALIASESPATH.write_lines(aliases)
+    json.dump(data, open(STATSPATH, 'w'))
 
 
 def respond_external_url(response, destination):
@@ -224,6 +257,6 @@ def api_validate_shortlink_handler(shortlink, body, request, response, cors: hug
 
 # Some testing fixtures
 if __name__ == '__main__':
-    print(read_db(DB))
+    print(read_db())
     print(find('mail'))
     print(find('foo'))
