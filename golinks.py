@@ -70,6 +70,24 @@ def add_link(shortlink, destination, creator):
     write_db(data)
     read_db(DB)
 
+def edit_link(shortlink, values):
+    """
+    Edits a shortlink to the database
+    """
+
+    origvalues = data.pop(values['origshortlink'])
+    origvalues['shortlink'] = shortlink
+    origvalues['destination'] = values['destination']
+
+    # remove if we dont allow creator to be modified
+    origvalues['creator'] = values.get('creator', '')
+    origvalues['modified'] = timenow()
+
+    data[shortlink] = origvalues
+
+    write_db(data)
+    read_db(DB)
+
 
 @hug.startup()
 def setup(api):
@@ -192,6 +210,11 @@ def api_delete_url_handler(shortlink, request, response, cors: hug.directives.co
 def api_add_url_handler(shortlink, body, request, response, cors: hug.directives.cors = "*"):
 
     add_link(shortlink, body['destination'], body.get('creator', ''))
+
+@hug.post('/_api/edit/{shortlink}')
+def api_edit_url_handler(shortlink, body, request, response, cors: hug.directives.cors = "*"):
+
+    edit_link(shortlink, body)
 
 @hug.get('/_api/validate/{shortlink}')
 def api_validate_shortlink_handler(shortlink, body, request, response, cors: hug.directives.cors = "*"):

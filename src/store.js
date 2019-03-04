@@ -2,9 +2,13 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 
+import _ from "lodash";
+
 Vue.use(Vuex)
 
+
 export default new Vuex.Store({
+
   state: {
     urls: []
   },
@@ -21,6 +25,15 @@ export default new Vuex.Store({
       axios.get('http://spectre:8000/_api/allurls')
         .then(r => r.data)
         .then(urls => {
+          urls.forEach(function(x) {
+
+            x.shortlinkok = false
+            x.shortlinkexists = false
+            x.editMode = false
+            x.origshortlink = x.shortlink
+            x.origdestination = x.destination
+
+          })
           commit('SET_URLS', urls)
         })
     }

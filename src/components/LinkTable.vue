@@ -20,15 +20,15 @@
        tr
          th
            p
-             input.input.is-small(:class="{'is-danger': shortlinkexists, 'is-success': shortlinkok}" ref="shortlink", type="text", placeholder="shortlink", @input="newurl.shortlink = golink2shortlink($event.target.value)", :value="golink", @keyup.enter="add_link(newurl)")
+             input.input.is-small(:class="{'is-danger': newurl.shortlinkexists, 'is-success': newurl.shortlinkok}" ref="shortlink", type="text", placeholder="shortlink", @input="newurl.shortlink = golink2shortlink($event.target.value, newurl)", :value="shortlink2golink(newurl.shortlink)", @keyup.enter="add(newurl)")
          th
            p.control.has-icons-left
-             input.input.is-small(type="text", placeholder="URL to shorten", v-model="newurl.destination", @keyup.enter="add_link(newurl)")
+             input.input.is-small(type="text", placeholder="URL to shorten", v-model="newurl.destination", @keyup.enter="add(newurl)")
              span.icon.is-small.is-left
                i.mdi.mdi-link
          th
            p.control.has-icons-left
-             input.input.is-small(type="text", placeholder="User", v-model="newurl.creator", @keyup.enter="add_link(newurl)")
+             input.input.is-small(type="text", placeholder="User", v-model="newurl.creator", @keyup.enter="add(newurl)")
              span.icon.is-small.is-left
                i.mdi.mdi-account
          th
@@ -45,30 +45,40 @@
              span.icon.is-small.is-left
                i.mdi.mdi-calendar-range
          th.icons
-             span.icon(@click="add_link(newurl)", :class="{active: shortlinkok, inactive: !shortlinkok}")
+             span.icon(@click="add(newurl)", :class="{active: newurl.shortlinkok, inactive: !newurl.shortlinkok}")
                i.mdi.mdi-plus-circle.add
        tr(v-for="url in urls")
          td.td-shortlink
-           input.input-hidden(:ref="'input-' + url.shortlink", :value="'go/' + url.shortlink")
-           span.golink(@click="copy(url.shortlink)")
-             span.go go/
-             span.shortlink {{url.shortlink}}
-           span.icon.clipboard(@click="copy(url.shortlink)")
-             i.mdi.mdi-clipboard-text
+           div(v-if="!url.editMode")
+             input.input-hidden(:ref="'input-' + url.shortlink", :value="'go/' + url.shortlink")
+             span.golink(@click="copy(url.shortlink)")
+               span.go go/
+               span.shortlink {{url.shortlink}}
+             span.icon.clipboard(@click="copy(url.shortlink)")
+               i.mdi.mdi-clipboard-text
+           input.input.is-small.is-info(v-if="url.editMode", :class="{'is-danger': url.shortlinkexists, 'is-success': url.shortlinkok}", :ref="'shortlink-' + url.shortlink", type="text", placeholder="shortlink", @input="url.shortlink = golink2shortlink($event.target.value, url)", :value="shortlink2golink(url.shortlink)", @keyup.enter="edit(url)")
          td.td-destination
-           span.destination {{url.destination | shorten}}
+           span.destination(v-if="!url.editMode") {{url.destination | shorten}}
+           input.input.is-small.is-info(v-if="url.editMode", type="text", v-model="url.destination", @keyup.enter="edit(url)")
          td.td-creator
            span.creator {{url.creator}}
+           //input.input.is-small.is-info(type="text", :value="url.creator")
          td.td-hits
            span.hits {{url.hits}}
+           //span.hits(v-if="!url.editMode") {{url.hits}}
+           //input.input.is-small.is-info(v-if="url.editMode", disabled, type="text", :value="url.hits")
          td.td-created
            span.created {{url.created | from_now}}
+           //span.created(v-if="!url.editMode") {{url.created | from_now}}
+           //input.input.is-small.is-info(v-if="url.editMode", disabled, type="text", :placeholder="url.created")
          td.td-modified
            span.modified {{url.modified | from_now}}
+           //span.modified(v-if="!url.editMode") {{url.modified | from_now}}
+           //input.input.is-small.is-info(v-if="url.editMode", disabled, type="text", placeholder="right now")
          td.icons.td-icons
-           span.icon
+           span.icon(@click="url.editMode = true")
              i.mdi.mdi-pencil.ed
-           span.icon(@click="del_link(url)")
+           span.icon(@click="del(url)")
              i.mdi.mdi-delete.del
 
 </template>
@@ -85,9 +95,7 @@ export default {
   },
   data: function() {
     return {
-      newurl: {shortlink: ""},
-      shortlinkexists: false,
-      shortlinkok: false
+      newurl: {shortlink: "", shortlinkexists: false, shortlinkok: false},
     };
   },
   props: {
@@ -105,48 +113,80 @@ export default {
       }
 
     },},
-  computed: {
-    golink: function(){
-      if(this.newurl.shortlink.length == 0) {
+  methods: {
+    focus: function(ref) {
+      this.$refs[ref].focus()
+    },
+    shortlink2golink: function(shortlink) {
+      if(shortlink.length == 0) {
         return "go/"
       }else {
-      return "go/" + this.newurl.shortlink
+      return "go/" + shortlink
       }
-    }
-  },
-  methods: {
+    },
+    edit: function(url) {
+
+
+        axios
+          .post("_api/edit/" + url.shortlink, url)
+          //.post("http://spectre:8000/_api/edit/" + url.shortlink, url)
+          .then(response => {
+            this.$store.dispatch("loadURLs");
+            url.editMode = false
+          });
+
+    },
     copy: function(val){
       this.$refs["input-"+val][0].select()
       document.execCommand('copy')
     },
-    golink2shortlink: function(str){
+    golink2shortlink: function(str, url){
 
       var shortlink =  str.replace(/^g/, '').replace(/^o/, '').replace(/^\//, '')
 
 
       if (shortlink.length > 0) {
+
+      // If user is editing, its possible the user wants to go back to the origshortlink
+      // in that case, dont validate because it'll be an error for sure (and that's not good)
+      if (url.origshortlink == shortlink) {
+
+              url.shortlinkexists = false
+              url.shortlinkok = true
+
+
+      }
+      else {
+
+
         axios.get("_api/validate/" + shortlink)
         //axios.get("http://spectre:8000/_api/validate/" + shortlink)
           .then(r => r.data)
           .then(exists => {
-              this.shortlinkexists = exists
-              this.shortlinkok = !exists
+
+              url.shortlinkexists = exists
+              url.shortlinkok = !exists
           })
 
       }
+
+
+      }
       else {
-        this.shortlinkexists = false
-        this.shortlinkok = false
+        // nothing is entered, show no colors
+        url.shortlinkexists = false
+        url.shortlinkok = false
       }
 
       return shortlink
     },
-    add_link: function() {
+    add: function() {
 
       // If shortlink isnt unique
-      if (!this.shortlinkok) {
+      if (!this.newurl.shortlinkok) {
         this.$refs.shortlink.select();
         this.$refs.shortlink.focus();
+
         return
       }
 
@@ -160,13 +200,13 @@ export default {
           //.post("http://spectre:8000/_api/add/" + this.newurl.shortlink, this.newurl)
           .then(response => {
             this.$store.dispatch("loadURLs");
-            this.newurl = {shortlink: ""};
+            this.newurl= {shortlink: "", shortlinkexists: false, shortlinkok: false}
           });
 
         this.$refs.shortlink.focus();
       }
     },
-    del_link: function(url) {
+    del: function(url) {
       axios
         .get("_api/delete/" + url.shortlink)
         //.get("http://spectre:8000/_api/delete/" + url.shortlink)
