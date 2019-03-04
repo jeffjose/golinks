@@ -22,7 +22,7 @@ export default new Vuex.Store({
       commit
     }) {
       axios.get('_api/allurls')
-     // axios.get('http://spectre:8000/_api/allurls')
+      //axios.get('http://spectre:8000/_api/allurls')
         .then(r => r.data)
         .then(urls => {
           urls.forEach(function(x) {

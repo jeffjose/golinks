@@ -6,6 +6,8 @@
      button.button.is-small.refreshing(@click="refreshing = true; reload()")
          i.mdi(:class="{'mdi-reload': !refreshing, 'mdi-progress-clock': refreshing}")
      button.button.is-small
+         i.mdi.mdi-content-save
+     button.button.is-small
          i.mdi.mdi-delete
 
    table.table.is-hoverable
@@ -64,7 +66,7 @@
            //input.checkbox(v-model="url.selected", type="checkbox")
            span.icon(@click="url.selected = !url.selected")
              i.mdi(:class="{'mdi-checkbox-blank-outline': !url.selected, 'mdi-checkbox-marked': url.selected}")
-         td.td-shortlink
+         td.td-shortlink(@dblclick="url.editMode = true")
            div.shortlinkwrapper(v-if="!url.editMode")
              input.input-hidden(:ref="'input-' + url.shortlink", :value="'go/' + url.shortlink")
              span.golink(@click="copy(url.shortlink)")
@@ -73,8 +75,8 @@
              span.icon.clipboard(@click="copy(url.shortlink)")
                i.mdi.mdi-clipboard-text
            input.input.is-small(v-if="url.editMode", :class="{'is-danger': url.shortlinkexists, 'is-success': url.shortlinkok}", :ref="'shortlink-' + url.shortlink", type="text", placeholder="shortlink", @input="url.shortlink = golink2shortlink($event.target.value, url)", :value="shortlink2golink(url.shortlink)", @keyup.enter="edit(url)")
-         td.td-destination
-           span.destination(v-if="!url.editMode") {{url.destination | shorten}}
+         td.td-destination(@dblclick="url.editMode = true")
+           span.destination(v-if="!url.editMode")  {{url.destination | shorten}}
            p.control.has-icons-left(v-if="url.editMode")
              input.input.is-small(type="text", v-model="url.destination", @keyup.enter="edit(url)", placeholder="URL to shorten")
              span.icon.is-small.is-left
@@ -375,6 +377,9 @@ table
 .buttonbar button:focus, .buttonbar button:active
   outline: none
   box-shadow: none
+
+.td-destination
+  cursor: pointer
 
 </style>
 
