@@ -59,7 +59,10 @@
            input.input.is-small.is-info(v-if="url.editMode", :class="{'is-danger': url.shortlinkexists, 'is-success': url.shortlinkok}", :ref="'shortlink-' + url.shortlink", type="text", placeholder="shortlink", @input="url.shortlink = golink2shortlink($event.target.value, url)", :value="shortlink2golink(url.shortlink)", @keyup.enter="edit(url)")
          td.td-destination
            span.destination(v-if="!url.editMode") {{url.destination | shorten}}
-           input.input.is-small.is-info(v-if="url.editMode", type="text", v-model="url.destination", @keyup.enter="edit(url)")
+           p.control.has-icons-left
+             input.input.is-small.is-info(v-if="url.editMode", type="text", v-model="url.destination", @keyup.enter="edit(url)", placeholder="URL to shorten")
+             span.icon.is-small.is-left
+               i.mdi.mdi-link
          td.td-creator
            span.creator {{url.creator}}
            //input.input.is-small.is-info(type="text", :value="url.creator")
@@ -77,7 +80,7 @@
            //input.input.is-small.is-info(v-if="url.editMode", disabled, type="text", placeholder="right now")
          td.icons.td-icons
            span.icon(@click="url.editMode = true")
-             i.mdi.mdi-pencil.ed
+             i.mdi.ed(:class="{'mdi-pencil': !url.editMode, 'mdi-check active': url.editMode}")
            span.icon(@click="del(url)")
              i.mdi.mdi-delete.del
 
@@ -263,6 +266,10 @@ tr:hover .del, tr:hover .ed
 
 .ed:hover
     color: $grey-dark !important
+    cursor: pointer
+
+.ed.active:hover
+    color: $green !important
     cursor: pointer
 
 thead tr span, tbody tr span
