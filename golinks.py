@@ -254,6 +254,12 @@ def api_validate_shortlink_handler(shortlink, body, request, response, cors: hug
 
     return shortlink_exists(shortlink)
 
+@hug.get('/_api/refresh')
+def api_validate_shortlink_handler(body, request, response, cors: hug.directives.cors = "*"):
+
+    read_db()
+    return get_all_links()
+
 
 # Some testing fixtures
 if __name__ == '__main__':

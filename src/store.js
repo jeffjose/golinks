@@ -36,7 +36,27 @@ export default new Vuex.Store({
           })
           commit('SET_URLS', urls)
         })
-    }
+    },
 
-  }
-})
+    forceRefresh({
+      commit
+    }) {
+      //axios.get('_api/refresh')
+      axios.get('http://spectre:8000/_api/refresh')
+        .then(r => r.data)
+        .then(urls => {
+          urls.forEach(function(x) {
+
+            x.shortlinkok = false
+            x.shortlinkexists = false
+            x.editMode = false
+            x.origshortlink = x.shortlink
+            x.origdestination = x.destination
+
+          })
+          commit('SET_URLS', urls)
+        })
+    },
+
+  },
+  })

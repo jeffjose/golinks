@@ -1,4 +1,14 @@
 <template lang="pug">
+  div
+   div.buttonbar
+     button.button.is-small
+       input.checkbox(type="checkbox")
+     button.button.is-small(@click="reload()")
+         i.mdi.mdi-reload
+     button.button.is-danger.is-small
+       span.icon
+         i.mdi.mdi-delete
+
    table.table.is-hoverable
      thead
        tr
@@ -99,7 +109,6 @@ import _ from "lodash";
 export default {
   name: "LinkTable",
   mounted() {
-    this.$refs.shortlink.focus();
   },
   data: function() {
     return {
@@ -131,6 +140,9 @@ export default {
       }else {
       return "go/" + shortlink
       }
+    },
+    reload: function() {
+      this.$store.dispatch("forceRefresh");
     },
     edit: function(url) {
 
