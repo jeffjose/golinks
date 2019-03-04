@@ -4,10 +4,10 @@
 </template>
 
 <script>
-  export default {
-    name: 'about',
-    created () {
-      document.title = "golinks for your home"
-    }
+export default {
+  name: "about",
+  created() {
+    document.title = "golinks for your home";
   }
+};
 </script>

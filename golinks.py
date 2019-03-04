@@ -13,7 +13,7 @@ ALIASESPATH = Path('data/aliases')
 data = {}
 
 
-def read_db(aliases = ALIASESPATH, stats = STATSPATH):
+def read_db(aliases=ALIASESPATH, stats=STATSPATH):
     """
     Reads all linkdata from the file
     """
@@ -27,7 +27,10 @@ def read_db(aliases = ALIASESPATH, stats = STATSPATH):
     # Output
     #  [{'shortlink': 'g', 'destination': 'google.com'}]
     #
-    aliasesvalues = [dict(zip(aliasesheaders, x.split())) for x in aliases.lines(retain = False)]
+    aliasesvalues = [
+        dict(zip(aliasesheaders, x.split()))
+        for x in aliases.lines(retain=False)
+    ]
 
     values = {}
     for aliases in aliasesvalues:
@@ -44,7 +47,10 @@ def read_db(aliases = ALIASESPATH, stats = STATSPATH):
 
 def get_all_links():
 
-    return sorted([x for x in data.values()], key = lambda x: x.get('created', timenow()), reverse = True)
+    return sorted([x for x in data.values()],
+                  key=lambda x: x.get('created', timenow()),
+                  reverse=True)
+
 
 def shortlink_exists(shortlink):
 
@@ -91,6 +97,7 @@ def add_link(shortlink, destination, creator):
 
     write_db(data)
     read_db()
+
 
 def edit_link(shortlink, values):
     """
@@ -205,14 +212,16 @@ def redirect_handler(request, response):
 
     elif request.method == 'GET' and not link:
         # Trying to go link that doesnt exist yet. Give an option to create
-        print("Trying to go to a link that doesnt exist yet. Here's an option to create")
+        print(
+            "Trying to go to a link that doesnt exist yet. Here's an option to create"
+        )
         pass
     elif request.method == 'POST' and body:
 
         # This is adding a new shortlink
         body = json.loads(body)
-        print("Setting up a new golink: {} -> {}".format(shortlink,
-                                                         body['destination']))
+        print("Setting up a new golink: {} -> {}".format(
+            shortlink, body['destination']))
         add_link(shortlink, body['destination'], body['creator'])
     elif request.method == 'POST' and not body:
         # Trying to create a go link with no data. Error
@@ -227,7 +236,7 @@ def frontend_handler(request, response):
 
 @hug.static('/_admin')
 def frontend_assets_handler():
-    return ("dist/",)
+    return ("dist/", )
 
 
 @hug.get('/_api/allurls')
@@ -237,28 +246,49 @@ def api_allurls_handler(request, response, cors: hug.directives.cors = "*"):
 
 
 @hug.get('/_api/delete/{shortlink}')
-def api_delete_url_handler(shortlink, request, response, cors: hug.directives.cors = "*"):
+def api_delete_url_handler(shortlink,
+                           request,
+                           response,
+                           cors: hug.directives.cors = "*"):
 
     del_link(shortlink)
 
 
 @hug.post('/_api/add/{shortlink}')
-def api_add_url_handler(shortlink, body, request, response, cors: hug.directives.cors = "*"):
+def api_add_url_handler(shortlink,
+                        body,
+                        request,
+                        response,
+                        cors: hug.directives.cors = "*"):
 
     add_link(shortlink, body['destination'], body.get('creator', ''))
 
+
 @hug.post('/_api/edit/{shortlink}')
-def api_edit_url_handler(shortlink, body, request, response, cors: hug.directives.cors = "*"):
+def api_edit_url_handler(shortlink,
+                         body,
+                         request,
+                         response,
+                         cors: hug.directives.cors = "*"):
 
     edit_link(shortlink, body)
 
+
 @hug.get('/_api/validate/{shortlink}')
-def api_validate_shortlink_handler(shortlink, body, request, response, cors: hug.directives.cors = "*"):
+def api_validate_shortlink_handler(shortlink,
+                                   body,
+                                   request,
+                                   response,
+                                   cors: hug.directives.cors = "*"):
 
     return shortlink_exists(shortlink)
 
+
 @hug.get('/_api/refresh')
-def api_validate_shortlink_handler(body, request, response, cors: hug.directives.cors = "*"):
+def api_validate_shortlink_handler(body,
+                                   request,
+                                   response,
+                                   cors: hug.directives.cors = "*"):
 
     read_db()
     return get_all_links()

@@ -22,10 +22,10 @@ export default new Vuex.Store({
       commit
     }) {
       axios.get('_api/allurls')
-      //axios.get('http://spectre:8000/_api/allurls')
+        //axios.get('http://spectre:8000/_api/allurls')
         .then(r => r.data)
         .then(urls => {
-          urls.forEach(function(x) {
+          urls.forEach(function (x) {
 
             x.shortlinkok = false
             x.shortlinkexists = false
@@ -43,10 +43,10 @@ export default new Vuex.Store({
       commit
     }) {
       axios.get('_api/refresh')
-      //axios.get('http://spectre:8000/_api/refresh')
+        //axios.get('http://spectre:8000/_api/refresh')
         .then(r => r.data)
         .then(urls => {
-          urls.forEach(function(x) {
+          urls.forEach(function (x) {
 
             x.shortlinkok = false
             x.shortlinkexists = false
@@ -61,4 +61,4 @@ export default new Vuex.Store({
     },
 
   },
-  })
+})

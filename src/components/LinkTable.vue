@@ -111,13 +111,12 @@ import _ from "lodash";
 
 export default {
   name: "LinkTable",
-  mounted() {
-  },
+  mounted() {},
   data: function() {
     return {
-      newurl: {shortlink: "", shortlinkexists: false, shortlinkok: false},
+      newurl: { shortlink: "", shortlinkexists: false, shortlinkok: false },
       selectall: false,
-      refreshing:false
+      refreshing: false
     };
   },
   props: {
@@ -128,105 +127,89 @@ export default {
       return moment(date).fromNow();
     },
     shorten: function(url) {
-      if(url.length > 30) {
-        return url.substring(0,30) + "..."
+      if (url.length > 30) {
+        return url.substring(0, 30) + "...";
       } else {
-        return url
+        return url;
       }
-
-    },},
+    }
+  },
   methods: {
-    toggleselectall: function(){
+    toggleselectall: function() {
+      this.urls.forEach(function(x) {
+        x.selected = !x.selected;
+      });
 
-      this.urls.forEach(function(x) {x.selected  = !x.selected})
-
-      this.selectall = !this.selectall
+      this.selectall = !this.selectall;
     },
     focus: function(ref) {
-      this.$refs[ref].focus()
+      this.$refs[ref].focus();
     },
     shortlink2golink: function(shortlink) {
-      if(shortlink.length == 0) {
-        return "go/"
-      }else {
-      return "go/" + shortlink
+      if (shortlink.length == 0) {
+        return "go/";
+      } else {
+        return "go/" + shortlink;
       }
     },
     reload: function() {
       this.$store.dispatch("forceRefresh").then(response => {
-
-        setTimeout( () => {
-        this.refreshing = false
-
-        }, 300)
-      }
-
-      )
+        setTimeout(() => {
+          this.refreshing = false;
+        }, 300);
+      });
     },
     edit: function(url) {
-
-
-        axios
-          .post("_api/edit/" + url.shortlink, url)
-          //.post("http://spectre:8000/_api/edit/" + url.shortlink, url)
-          .then(response => {
-            this.$store.dispatch("loadURLs");
-            url.editMode = false
-          });
-
+      axios
+        .post("_api/edit/" + url.shortlink, url)
+        //.post("http://spectre:8000/_api/edit/" + url.shortlink, url)
+        .then(response => {
+          this.$store.dispatch("loadURLs");
+          url.editMode = false;
+        });
     },
-    copy: function(val){
-      this.$refs["input-"+val][0].select()
-      document.execCommand('copy')
+    copy: function(val) {
+      this.$refs["input-" + val][0].select();
+      document.execCommand("copy");
     },
-    golink2shortlink: function(str, url){
-
-      var shortlink =  str.replace(/^g/, '').replace(/^o/, '').replace(/^\//, '').replace(/ /, '-')
-
+    golink2shortlink: function(str, url) {
+      var shortlink = str
+        .replace(/^g/, "")
+        .replace(/^o/, "")
+        .replace(/^\//, "")
+        .replace(/ /, "-");
 
       if (shortlink.length > 0) {
-
-      // If user is editing, its possible the user wants to go back to the origshortlink
-      // in that case, dont validate because it'll be an error for sure (and that's not good)
-      if (url.origshortlink == shortlink) {
-
-              url.shortlinkexists = false
-              url.shortlinkok = true
-
-
-      }
-      else {
-
-
-        axios.get("_api/validate/" + shortlink)
-        //axios.get("http://spectre:8000/_api/validate/" + shortlink)
-          .then(r => r.data)
-          .then(exists => {
-
-              url.shortlinkexists = exists
-              url.shortlinkok = !exists
-          })
-
-      }
-
-
-      }
-      else {
+        // If user is editing, its possible the user wants to go back to the origshortlink
+        // in that case, dont validate because it'll be an error for sure (and that's not good)
+        if (url.origshortlink == shortlink) {
+          url.shortlinkexists = false;
+          url.shortlinkok = true;
+        } else {
+          axios
+            .get("_api/validate/" + shortlink)
+            //axios.get("http://spectre:8000/_api/validate/" + shortlink)
+            .then(r => r.data)
+            .then(exists => {
+              url.shortlinkexists = exists;
+              url.shortlinkok = !exists;
+            });
+        }
+      } else {
         // nothing is entered, show no colors
-        url.shortlinkexists = false
-        url.shortlinkok = false
+        url.shortlinkexists = false;
+        url.shortlinkok = false;
       }
 
-      return shortlink
+      return shortlink;
     },
     add: function() {
-
       // If shortlink isnt unique
       if (!this.newurl.shortlinkok) {
         this.$refs.shortlink.select();
         this.$refs.shortlink.focus();
 
-        return
+        return;
       }
 
       // Only if these values are set
@@ -239,18 +222,20 @@ export default {
           //.post("http://spectre:8000/_api/add/" + this.newurl.shortlink, this.newurl)
           .then(response => {
             this.$store.dispatch("loadURLs");
-            this.newurl= {shortlink: "", shortlinkexists: false, shortlinkok: false}
+            this.newurl = {
+              shortlink: "",
+              shortlinkexists: false,
+              shortlinkok: false
+            };
           });
 
         this.$refs.shortlink.focus();
       }
     },
     del: function(url) {
-      axios
-        .get("_api/delete/" + url.shortlink)
-        .then(response => {
-          this.$store.dispatch("loadURLs");
-        });
+      axios.get("_api/delete/" + url.shortlink).then(response => {
+        this.$store.dispatch("loadURLs");
+      });
     }
   }
 };
