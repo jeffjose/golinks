@@ -142,7 +142,7 @@ export default {
     },
     golink2shortlink: function(str, url){
 
-      var shortlink =  str.replace(/^g/, '').replace(/^o/, '').replace(/^\//, '')
+      var shortlink =  str.replace(/^g/, '').replace(/^o/, '').replace(/^\//, '').replace(/ /, '-')
 
 
       if (shortlink.length > 0) {
