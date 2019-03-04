@@ -1,6 +1,7 @@
 import hug
 import simplejson as json
 from urllib import parse
+import copy
 
 import falcon
 import datetime
@@ -141,6 +142,8 @@ def write_db(data):
     """
     Handles writing of data to database
     """
+
+    data = copy.deepcopy(data)
 
     aliaseslinetemplate = "{shortlink} {destination}"
 
