@@ -1,7 +1,7 @@
 {
-  "name": "frontend",
+  "name": "golinks",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -53,5 +53,10 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "description": "golinks for your home",
+  "main": "index.js",
+  "repository": "https://github.com/jeffjose/golinks",
+  "author": "Jeffrey Jose <jeffjosejeff@gmail.com>",
+  "license": "MIT"
 }
