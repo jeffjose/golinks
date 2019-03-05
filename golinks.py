@@ -13,6 +13,11 @@ ALIASESPATH = Path('data/aliases')
 data = {}
 
 
+def is_internal(url):
+
+    return url.startswith('192.168') or url.startswith('10.') or url.startswith('172.')
+
+
 def read_db(aliases=ALIASESPATH, stats=STATSPATH):
     """
     Reads all linkdata from the file
@@ -185,9 +190,11 @@ def respond_internal_url(response, destination):
     Use javascript to redirect Internal URLs
     """
 
+    destination = 'http://%s' % destination
+
     response.content_type = falcon.MEDIA_HTML
 
-    response.body = '''<html><head><script>window.location="http://{0}";</script></head><body>Redirecting to {0}</body></html>'''.format(
+    response.body = '''<html><head><script>window.location="{0}";</script></head><body>Redirecting to {0}</body></html>'''.format(
         destination)
 
 
@@ -203,7 +210,7 @@ def redirect_handler(request, response):
     if request.method == 'GET' and link:
         print("Redirecting: {} -> {}".format(shortlink, link['destination']))
 
-        if link['destination'].startswith('192.168'):
+        if is_internal(link['destination']):
             update_stats(link)
             return respond_internal_url(response, link['destination'])
         else:
