@@ -35,8 +35,19 @@ export default {
 <style scoped lang="sass">
 @import "~bulma/sass/utilities/initial-variables";
 
-.navbar a
+.navbar-item
   font-size: 0.90rem;
   color: $grey-dark !important
+  border-bottom: 3px solid $white
+  transition: 100ms all ease-in-out
+
+.navbar-item:hover
+  //background-color: lighten($grey-dark, 50%) !important
+  background-color: $white !important
+  border-bottom: 3px solid $grey-dark
+  color: $black !important
+
+.logo:hover
+  border-bottom: 3px solid $white !important
 
 </style>
