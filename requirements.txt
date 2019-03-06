@@ -1,7 +1,7 @@
-setuptools==38.4.0
+setuptools==40.8.0
 gunicorn==19.9.0
 falcon==1.4.1
 hug==2.4.1
 forked_path==0.2.3
 simplejson==3.16.0
-path.py==10.5
+path.py==11.5
