@@ -1,9 +1,12 @@
 <template lang="pug">
-  div
+  div.home
     Header
     section.section
       div.columns
-        .column.is-full
+        .column.is-narrow
+          div.sidebar
+            p foo
+        .column.is-four-fifths
           LinkTable(:urls="urls")
 
 </template>
@@ -30,4 +33,14 @@ export default {
 </script>
 
 <style scoped lang="sass">
+.columns
+  display: flex;
+  flex-direction: row
+  align-items: stretch
+
+.sidebar
+  width: 150px;
+  border-right: 1px solid black
+  height: 100%
+
 </style>

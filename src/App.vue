@@ -20,9 +20,13 @@ $table-row-active-background-color: lighten(adjust-hue($blue, 30%), 15%)
 
 $table-row-hover-background-color: $white-ter
 
+
 $family-sans-serif: 'Roboto', sans-serif;
 
 // 2. Import the rest of Bulma
 @import "~bulma";
 
+
+html
+  background-color: rgb(246, 249, 252);
 </style>
