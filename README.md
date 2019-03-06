@@ -43,3 +43,9 @@ ifconfig up && ifconfig down
 ```
 sudo systemctl restart systemd-resolved.service ; sudo systemd-resolve --flush-caches ; sudo systemd-resolve --statistics
 ```
+
+## Update requirments.txt
+```
+pip3 install pip-upgrader
+pip-upgrade requirements.txt --skip-virtualenv-check
+```
